@@ -6,8 +6,8 @@
   <title>Counter</title>
 </head>
 <body>
-  <button id="btn">Click me</button>
-  <p id="out">Clicks: 0</p>
+  <button type="button" id="btn">Click me</button>
+  <p id="out" role="status" aria-atomic="true">Clicks: 0</p>
   <script>
     let n = 0;
     const out = document.getElementById('out');
