@@ -21,7 +21,7 @@ function shipping(total) {
 
 /** Page `page` (1-based) of the product list, `size` items per page. */
 function paginate(items, page, size) {
-  const start = page * size;
+  const start = (page - 1) * size;
   return items.slice(start, start + size);
 }
 
