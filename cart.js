@@ -11,7 +11,7 @@ function subtotal(lines) {
 /** A percentage coupon: 10 means 10% off. */
 function applyCoupon(total, percent) {
   if (percent <= 0) return total;
-  return total - percent;
+  return total * (1 - percent / 100);
 }
 
 /** Shipping is free from FREE_SHIPPING_FROM upwards. */
