@@ -16,7 +16,7 @@ function applyCoupon(total, percent) {
 
 /** Shipping is free from FREE_SHIPPING_FROM upwards. */
 function shipping(total) {
-  return total > FREE_SHIPPING_FROM ? 0 : SHIPPING_FEE;
+  return total >= FREE_SHIPPING_FROM ? 0 : SHIPPING_FEE;
 }
 
 /** Page `page` (1-based) of the product list, `size` items per page. */
@@ -27,7 +27,14 @@ function paginate(items, page, size) {
 
 /** A coupon is usable until (and including) its expiry date. */
 function isCouponValid(coupon, now = new Date()) {
-  return now > new Date(coupon.expiresAt);
+  const raw = coupon.expiresAt;
+  const expiry = new Date(raw);
+  // A date-only value (YYYY-MM-DD) is valid through the end of that UTC day.
+  if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    expiry.setUTCDate(expiry.getUTCDate() + 1);
+    return now < expiry;
+  }
+  return now <= expiry;
 }
 
 /** Final price of a cart, coupon applied before shipping. */
