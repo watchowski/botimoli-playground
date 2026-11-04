@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hello from Botimoli</title>
+<style>
+  body { font-family: system-ui, sans-serif; text-align: center; margin-top: 4rem; }
+  button { font-size: 1.1rem; padding: .5rem 1.2rem; cursor: pointer; }
+</style>
+</head>
+<body>
+  <h1>Hello from Botimoli</h1>
+  <button id="btn" type="button">Clicked 0 times</button>
+  <script>
+    var count = 0;
+    var btn = document.getElementById('btn');
+    btn.addEventListener('click', function () {
+      count++;
+      btn.textContent = 'Clicked ' + count + (count === 1 ? ' time' : ' times');
+    });
+  </script>
+</body>
+</html>
