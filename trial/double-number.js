@@ -12,13 +12,18 @@ function fail(message) {
   process.exitCode = 1;
 }
 
-// String() writes very small numbers in exponent form (1e-7); spell those out.
-// Results stay far below 1e21, so only negative exponents can occur.
-function plainDecimal(n) {
-  const match = /^(-?)(\d)(?:\.(\d+))?e-(\d+)$/.exec(String(n));
-  if (!match) return String(n);
-  const [, sign, lead, rest = '', exponent] = match;
-  return `${sign}0.${'0'.repeat(Number(exponent) - 1)}${lead}${rest}`;
+// Doubles a string of digits exactly: from the last digit to the first, carrying as needed.
+// The text is never turned into a binary number, so no digit is lost at any length.
+function doubleDigits(digits) {
+  const out = [];
+  let carry = 0;
+  for (let i = digits.length - 1; i >= 0; i--) {
+    const twice = Number(digits[i]) * 2 + carry;
+    out.push(twice % 10);
+    carry = Math.floor(twice / 10);
+  }
+  if (carry) out.push(carry);
+  return out.reverse().join('');
 }
 
 function main(args) {
@@ -29,12 +34,18 @@ function main(args) {
   if (!PLAIN_DECIMAL.test(input)) {
     return fail(`"${input}" is not a plain decimal number such as 4, -2.5 or 0.75.`);
   }
-  const value = Number(input);
-  if (Math.abs(value) > Number.MAX_SAFE_INTEGER) {
-    return fail(`"${input}" is too large. The limit is ${Number.MAX_SAFE_INTEGER}.`);
-  }
-  // String(-0) is "0", so a negative zero prints as 0.
-  console.log(plainDecimal(value * 2));
+  const negative = input.startsWith('-');
+  const [intPart, fracPart = ''] = (negative ? input.slice(1) : input).split('.');
+  // Doubling keeps the same number of decimal places, so the point stays where it was.
+  const doubled = doubleDigits(intPart + fracPart);
+  const split = doubled.length - fracPart.length;
+  // No leading zeros in the whole part (a single "0" stays), no trailing zeros in the fraction.
+  const whole = doubled.slice(0, split).replace(/^0+(?=\d)/, '');
+  const fraction = doubled.slice(split).replace(/0+$/, '');
+  // A negative zero prints as 0.
+  const isZero = whole === '0' && fraction === '';
+  const sign = negative && !isZero ? '-' : '';
+  console.log(fraction ? `${sign}${whole}.${fraction}` : `${sign}${whole}`);
 }
 
 main(process.argv.slice(2));
